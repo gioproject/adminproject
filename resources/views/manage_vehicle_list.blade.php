@@ -18,28 +18,29 @@
 
        <ul id="saveform_errlist"></ul>
 
+       <form action="">
        <input type="hidden" id="edit_id"> 
        <input type="hidden" name="emp_photo" class="emp_photo" id="emp_photo"> 
 
        <div class="form-group mb-3">
         <label for="">Vehicle Name: </label>
-        <input type="text" name="vehicle_name" value="{{ old('vehicle_name')}}" class="vehicle_name form-control"> 
+        <input type="text" id="vehicle_name" value="{{ old('vehicle_name')}}" class="vehicle_name form-control"> 
       </div>
 
       <div class="form-group mb-3">
         <label for="">Vehicle Registration Number: </label>
-        <input type="text" name="vehicle_registration_number" value="{{ old('vehicle_registration_number')}}" class="vehicle_registration_number form-control"> 
+        <input type="text" id="vehicle_registration_number" value="{{ old('vehicle_registration_number')}}" class="vehicle_registration_number form-control"> 
       </div>
 
       <div class="form-group mb-3">
         <label for="">Vehicle Number Of Seats: </label>
-        <input type="text" name="vehicle_number_of_seats" value="{{ old('vehicle_number_of_seats')}}" class="vehicle_number_of_seats form-control"> 
+        <input type="text" id="vehicle_number_of_seats" value="{{ old('vehicle_number_of_seats')}}" class="vehicle_number_of_seats form-control"> 
       </div>
 
       <div class="form-group mb-3">
         <label for="">Driver: </label>   
-        <select class="form-control selectpicker driver_name" name="driver_name">
-     
+
+        <select class="form-control selectpicker driver_name" name="driver_name" id="driver_name">
           @foreach($dataa as $data)
           <option value="{{ $data->name }}">{{ $data->name }}</option>
           @endforeach
@@ -48,7 +49,7 @@
 
       <div class="form-group mb-3">
         <label for="">Vehicle Category: </label>
-        <input type="text" name="vehicle_category" value="{{ old('vehicle_category')}}" class="vehicle_category form-control"> 
+        <input type="text" id="vehicle_category" value="{{ old('vehicle_category')}}" class="vehicle_category form-control"> 
       </div>
 
       <div class="form-group mb-3">
@@ -63,8 +64,9 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary update_driver">Update</button>
+        <button type="button" class="btn btn-primary update_vehicle">Update</button>
       </div>
+    </form>
     </div>
   </div>
 </div>
@@ -164,7 +166,6 @@
                 $('#edit_id').val(vehicle_id);
 
               
-                
             }
 
         });
@@ -173,70 +174,70 @@
 
     // <!-- {{-- EditDriver Button --}} -->
 
+    $(document).on('click', '.update_vehicle', function (e) {
 
-    // UPDATE 
+      e.preventDefault();
+            var vehicle_id = $('#edit_id').val();
 
-    // $(document).on('click', '.update_driver', function (e) {
-
-    //   e.preventDefault();
-    //         var driver_id = $('#edit_id').val();
-
-    //         var data = {
-    //             'name' : $('#name').val(),
-    //             'contact' : $('#contact').val(),
-    //             'address' : $('#address').val(),
-    //             'email' : $('#email').val(),
-    //         }
-
-    //         $.ajaxSetup({
-    //           headers: {
-    //               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-    //               }
-    //             });
-
-    //         $.ajax({
-    //           type: "post",
-    //           url: "/drivers/update_driver/"+driver_id,
-    //           data: data,
-    //           dataType: "json",
-    //           success: function (response) {
-
-    //             // console.log(response);
-              
-    //             if(response.status == 400){
-    //               $('#updateform_errlist').html("");
-    //               $('#updateform_errlist').addClass('alert alert-danger');
-    //               $.each(response.errors, function (key, err_values){
-    //                 $('#updateform_errlist').append('<li>'+err_values+'</li>');
-    //             });
-
-    //           }else if(response.status == 404){
-    //               $('#updateform_errlist').html("");
-    //               $('#success_message').addClass('alert alert-success');
-    //               $('#success_message').text(response.message);
-
-    //             }else{
+            var data = {
+                'vehicle_name' : $('#vehicle_name').val(),
+                'vehicle_registration_number' : $('#vehicle_registration_number').val(),
+                'vehicle_number_of_seats' : $('#vehicle_number_of_seats').val(),
+                'driver_name' : $('#driver_name').val(),
+                'vehicle_category' : $('#vehicle_category').val(),
                
-    //               $('#Edit_Driver_Modal').modal('hide');
+            }
+              
+            $.ajaxSetup({
+              headers: {
+                  'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                  }
+                });
+
+            $.ajax({
+              type: "post",
+              url: "/vehicles/update_vehicle/"+vehicle_id,
+              data: data,
+              dataType: "json",
+              success: function (response) {
+
+                // console.log(response);
+              
+                if(response.status == 400){
+                  $('#updateform_errlist').html("");
+                  $('#updateform_errlist').addClass('alert alert-danger');
+                  $.each(response.errors, function (key, err_values){
+                    $('#updateform_errlist').append('<li>'+err_values+'</li>');
+                });
+
+              }else if(response.status == 404){
+                  $('#updateform_errlist').html("");
+                  $('#success_message').addClass('alert alert-success');
+                  $('#success_message').text(response.message);
+
+                }else{
+               
+                  $('#Edit_Vehicle_Modal').modal('hide');
         
-    //               $('.drivers_datatable').DataTable().ajax.reload();
+                  $('.vehicle_datatable').DataTable().ajax.reload();
                 
-    //               Swal.fire({
-    //               position: 'center',
-    //               icon: 'success',
-    //               title: 'Record has successfully Updated',
-    //               showConfirmButton: true,
-    //               timer: 2500
-    //               });
+                  Swal.fire({
+                  position: 'center',
+                  icon: 'success',
+                  title: 'Record has successfully Updated',
+                  showConfirmButton: true,
+                  timer: 2500
+                  });
                   
-    //         }
+            }
 
-    //       }
-    //     });
+          }
+        });
 
-    //   });
+      });
 
       // Update
+
 
 
       // DELETE

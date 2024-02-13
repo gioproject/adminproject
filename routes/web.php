@@ -87,7 +87,7 @@ Route::group(['prefix' => 'vehicles', 'middleware' => ['auth']], function(){
     Route::get('/vehicle_list', [App\Http\Controllers\VehicleController::class, 'index'])->name('vehicles.index');
     Route::get('/manage_vehicle_list', [App\Http\Controllers\VehicleController::class, 'manage_vehicle_list'])->name('manage_vehicles.index');
     Route::get('/edit/{id}', [App\Http\Controllers\VehicleController::class, 'edit']);
-    // Route::post('/update_driver/{id}', [App\Http\Controllers\DriverController::class, 'update']);
+    Route::post('/update_vehicle/{id}', [App\Http\Controllers\VehicleController::class, 'update']);
     // Route::get('/delete_driver/{id}', [App\Http\Controllers\DriverController::class, 'delete']);
 });
 

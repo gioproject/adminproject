@@ -10,6 +10,8 @@ use App\Models\Driver;
 use Illuminate\Support\Facades\Validator;
 use DataTables;
 
+use Illuminate\Support\Facades\File;
+
 class VehicleController extends Controller
 {
     public function add_vehicle(){
@@ -46,6 +48,70 @@ class VehicleController extends Controller
                 'vehicle'=>$vehicle,
             ]);
         }
+    }
+
+    public function update(Request $request, $id){
+
+        $validator = Validator::make($request->all(), [
+
+            'vehicle_name'=>'required',
+            'vehicle_registration_number'=>'required',
+            'vehicle_number_of_seats'=>'required',
+            'driver_name'=>'required',
+            'vehicle_category'=>'required',
+            'photo'=>'required',
+           
+        ]);
+    
+         if($validator->fails()){
+            return response()->json([
+                'status'=>400,
+                'errors'=>$validator->messages(),
+            ]);
+         }
+         else{
+            $vehicle = Vehicle::find($id);
+            
+            if($vehicle){
+                $vehicle->vehicle_name = $request->input('vehicle_name');
+                $vehicle->vehicle_registration_number = $request->input('vehicle_registration_number');
+                $vehicle->vehicle_number_of_seats = $request->input('vehicle_number_of_seats');
+                $vehicle->driver_name = $request->input('driver_name');
+                $vehicle->vehicle_category = $request->input('vehicle_category');
+                            
+                    if($request->hasfile('photo'))
+                    {
+
+                        $destination = 'assets/img/'. $vehicle->photo;
+                        if(File::exit($destination)){
+                            File::delete($destination);
+                        }
+                        $file = $request->file('photo');
+                        $extention = $file->getClientOriginalExtension();
+                        $filename = time().'.'.$extention;
+                        $file->move('assets/img/', $filename);
+                        $vehicle->photo = $filename;
+
+                    }
+
+                $vehicle->update();
+
+    
+                return response()->json([
+                    'status'=>200,
+                    'message'=>'vehicle updated Successfully !',
+                ]);
+    
+            }else{
+                return response()->json([
+                    'status'=>404,
+                    'message'=>'Vehicle Not Found !',
+                ]);
+            }
+           
+         }
+
+
     }
     
     public function manage_vehicle_list(Request $request){
@@ -99,9 +165,11 @@ class VehicleController extends Controller
             $filename = time().'.'.$extention;
             $file->move('assets/img/', $filename);
             $vehicle->photo = $filename;
+
         }
 
         $vehicle->save();
+
 
         $status = "";
         $message = "";
