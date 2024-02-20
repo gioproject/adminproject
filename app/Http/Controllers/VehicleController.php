@@ -16,7 +16,6 @@ class VehicleController extends Controller
 {
     public function add_vehicle(){
 
-
         $data = Driver::all();
         
         return view('add_vehicle', compact('data'));
@@ -59,7 +58,6 @@ class VehicleController extends Controller
             'vehicle_number_of_seats'=>'required',
             'driver_name'=>'required',
             'vehicle_category'=>'required',
-            'photo'=>'required',
            
         ]);
     
@@ -70,6 +68,7 @@ class VehicleController extends Controller
             ]);
          }
          else{
+
             $vehicle = Vehicle::find($id);
             
             if($vehicle){
@@ -83,9 +82,10 @@ class VehicleController extends Controller
                     {
 
                         $destination = 'assets/img/'. $vehicle->photo;
-                        if(File::exit($destination)){
+                        if(File::exists($destination)){
                             File::delete($destination);
                         }
+
                         $file = $request->file('photo');
                         $extention = $file->getClientOriginalExtension();
                         $filename = time().'.'.$extention;
@@ -96,7 +96,6 @@ class VehicleController extends Controller
 
                 $vehicle->update();
 
-    
                 return response()->json([
                     'status'=>200,
                     'message'=>'vehicle updated Successfully !',
@@ -110,7 +109,6 @@ class VehicleController extends Controller
             }
            
          }
-
 
     }
     
@@ -130,7 +128,6 @@ class VehicleController extends Controller
                 ->rawColumns(['action'])
                 ->make(true);
         }
-
         return view('manage_vehicle_list', compact('dataa'));
     }
 
@@ -141,7 +138,7 @@ class VehicleController extends Controller
 
             'vehicle_name'=>'required',
             'vehicle_registration_number'=>'required',
-            'vehicle_number_of_seats'=>'required',
+            'vehicle_number_of_seats'=>'required|integer',
             'driver_name'=>'required',
             'vehicle_category'=>'required',
             'photo'=>'required',
@@ -170,7 +167,6 @@ class VehicleController extends Controller
 
         $vehicle->save();
 
-
         $status = "";
         $message = "";
 
@@ -184,8 +180,16 @@ class VehicleController extends Controller
 
         return back()->with($status, $message);
 
-      
+    }
 
+    public function delete($id){
+
+        $vehicle = Vehicle::find($id);
+        
+        $destination = 'assets/img/'. $vehicle->photo;
+        File::delete($destination);
+
+        $vehicle->delete();
     }
   
 }

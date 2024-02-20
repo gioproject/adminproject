@@ -18,23 +18,24 @@
 
        <ul id="saveform_errlist"></ul>
 
-       <form action="">
-       <input type="hidden" id="edit_id"> 
+      <form id="UpdateVehicleForm" method="POST" enctype="multipart/form-data">
+       <input type="hidden" name="id" id="edit_id"> 
        <input type="hidden" name="emp_photo" class="emp_photo" id="emp_photo"> 
 
+       
        <div class="form-group mb-3">
         <label for="">Vehicle Name: </label>
-        <input type="text" id="vehicle_name" value="{{ old('vehicle_name')}}" class="vehicle_name form-control"> 
+        <input type="text" name="vehicle_name" value="{{ old('vehicle_name')}}" class="vehicle_name form-control"> 
       </div>
 
       <div class="form-group mb-3">
         <label for="">Vehicle Registration Number: </label>
-        <input type="text" id="vehicle_registration_number" value="{{ old('vehicle_registration_number')}}" class="vehicle_registration_number form-control"> 
+        <input type="text" name="vehicle_registration_number" value="{{ old('vehicle_registration_number')}}" class="vehicle_registration_number form-control"> 
       </div>
 
       <div class="form-group mb-3">
         <label for="">Vehicle Number Of Seats: </label>
-        <input type="text" id="vehicle_number_of_seats" value="{{ old('vehicle_number_of_seats')}}" class="vehicle_number_of_seats form-control"> 
+        <input type="text" name="vehicle_number_of_seats" value="{{ old('vehicle_number_of_seats')}}" class="vehicle_number_of_seats form-control"> 
       </div>
 
       <div class="form-group mb-3">
@@ -49,7 +50,7 @@
 
       <div class="form-group mb-3">
         <label for="">Vehicle Category: </label>
-        <input type="text" id="vehicle_category" value="{{ old('vehicle_category')}}" class="vehicle_category form-control"> 
+        <input type="text" name="vehicle_category" value="{{ old('vehicle_category')}}" class="vehicle_category form-control"> 
       </div>
 
       <div class="form-group mb-3">
@@ -57,14 +58,14 @@
         <input type="file" name="photo" class="photo form-control" id="photo"> 
       </div>
 
-      <div class="photo">
-        
+      <div class="img">
+  
       </div>
       
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary update_vehicle">Update</button>
+        <button type="submit" class="btn btn-primary update_vehicle">Update</button>
       </div>
     </form>
     </div>
@@ -82,10 +83,11 @@
           <table class="table table-bordered vehicle_datatable">
               <thead>
                   <tr>
-                      <th>ID</th>
+                      <th>#</th>
                       <th>Vehicle Name</th>
-                      <th>Vehicle Number Of Seats</th>
-                      <th>Driver Name</th>
+                      <th>Rec No.</th>
+                      <th>Seats</th>
+                      <th>Driver</th>
                       <th>Vehicle Category</th>
                       <th>Action</th>
                   </tr>
@@ -115,8 +117,6 @@
 
   $(document).ready(function (){
 
-
-  
     var table = $('.vehicle_datatable').DataTable({
      processing: true,
      serverSide: true,
@@ -124,11 +124,21 @@
      columns: [
                 {data: 'id', name: 'id'},
                 {data: 'vehicle_name', name: 'vehicle_name'},    
+                {data: 'vehicle_registration_number', name: 'vehicle_registration_number'},    
                 {data: 'vehicle_number_of_seats', name: 'vehicle_number_of_seats'},    
                 {data: 'driver_name', name: 'driver_name'}, 
                 {data: 'vehicle_category', name: 'vehicle_category'},
                 {data: 'action', name: 'action', orderable: false, searchable: false},
-              ]
+              ],
+
+        // columnDefs: [ 
+        //     {
+        //       targets: 3,
+        //       render: function( data ) {
+        //         return '<span class="badge badge-primary">' +data+ '</span>';
+        //       }
+        //     }
+        // ]
       });
 
 
@@ -154,18 +164,18 @@
 
             console.log(response);
 
-                $('.photo').html("");
+                $('.img').html("");
 
-                $(".photo").append(`<img src="/assets/img/${response.vehicle.photo}"  class="img-fluid elevation-2" alt="User Image">`);
+                $(".img").append(`<img src="/assets/img/${response.vehicle.photo}"  class="img-fluid elevation-2" alt="User Image">`);
 
                 $('.vehicle_name').val(response.vehicle.vehicle_name);
                 $('.vehicle_registration_number').val(response.vehicle.vehicle_registration_number);
                 $('.vehicle_number_of_seats').val(response.vehicle.vehicle_number_of_seats);
                 $('.driver_name').val(response.vehicle.driver_name).change();
                 $('.vehicle_category').val(response.vehicle.vehicle_category);
+          
                 $('#edit_id').val(vehicle_id);
 
-              
             }
 
         });
@@ -174,19 +184,21 @@
 
     // <!-- {{-- EditDriver Button --}} -->
 
-    $(document).on('click', '.update_vehicle', function (e) {
+    $(document).on('submit', '#UpdateVehicleForm', function (e) {
 
       e.preventDefault();
             var vehicle_id = $('#edit_id').val();
 
-            var data = {
-                'vehicle_name' : $('#vehicle_name').val(),
-                'vehicle_registration_number' : $('#vehicle_registration_number').val(),
-                'vehicle_number_of_seats' : $('#vehicle_number_of_seats').val(),
-                'driver_name' : $('#driver_name').val(),
-                'vehicle_category' : $('#vehicle_category').val(),
-               
-            }
+            // var data = {
+            //     'vehicle_name' : $('#vehicle_name').val(),
+            //     'vehicle_registration_number' : $('#vehicle_registration_number').val(),
+            //     'vehicle_number_of_seats' : $('#vehicle_number_of_seats').val(),
+            //     'driver_name' : $('#driver_name').val(),
+            //     'vehicle_category' : $('#vehicle_category').val(),
+                
+            // }
+
+            let formData = new FormData($('#UpdateVehicleForm')[0]);
               
             $.ajaxSetup({
               headers: {
@@ -195,10 +207,11 @@
                 });
 
             $.ajax({
-              type: "post",
+              type: "POST",
               url: "/vehicles/update_vehicle/"+vehicle_id,
-              data: data,
-              dataType: "json",
+              data: formData,
+              contentType: false,
+              processData: false,
               success: function (response) {
 
                 // console.log(response);
@@ -216,7 +229,9 @@
                   $('#success_message').text(response.message);
 
                 }else{
-               
+
+                  $('#photo').val('');
+
                   $('#Edit_Vehicle_Modal').modal('hide');
         
                   $('.vehicle_datatable').DataTable().ajax.reload();
@@ -228,6 +243,8 @@
                   showConfirmButton: true,
                   timer: 2500
                   });
+
+                  
                   
             }
 
@@ -242,58 +259,59 @@
 
       // DELETE
 
-      // $(document).on('click', '.delete_driver', function (e){
+      $(document).on('click', '.delete_vehicle', function (e){
 
-      //   var driver_id = $(this).val();
+        var vehicle_id = $(this).val();
 
-      //   // console.log(driver_id);
+        // console.log(driver_id);
 
-      //     Swal.fire({
-      //       title: 'Are you sure?',
-      //       text: "You won't be able to revert this!",
-      //       icon: 'warning',
-      //       showCancelButton: true,
-      //       confirmButtonColor: '#d33',
-      //       cancelButtonColor: '#6c757d',
-      //       confirmButtonText: 'Delete record!'
-      //     }).then((result) => {
-      //       if (result.value) {
-      //         $.ajax({
-      //           url: "/drivers/delete_driver/" +driver_id,
-      //           method: "get",
-      //           data: {_token: "{{ csrf_token() }}", driver_id: driver_id},
-      //           success: function(response){
-      //             console.log(response);
-      //             if(response.success)
-      //             {
-      //               Swal.fire(
-      //                 'Deleted!',
-      //                 'Record has been deleted.',
-      //                 'success'
-      //               );
+          Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Delete record!'
+
+          }).then((result) => {
+            if (result.value) {
+              $.ajax({
+                url: "/vehicles/delete_vehicle/" +vehicle_id,
+                method: "get",
+                data: {_token: "{{ csrf_token() }}", vehicle_id: vehicle_id},
+                success: function(response){
+                  console.log(response);
+                  if(response.success)
+                  {
+                    Swal.fire(
+                      'Deleted!',
+                      'Record has been deleted.',
+                      'success'
+                    );
                     
-      //             }
+                  }
 
-      //             Swal.fire({
-      //             position: 'center',
-      //             icon: 'success',
-      //             title: 'Record has successfully Deleted',
-      //             showConfirmButton: true,
-      //             timer: 2500
-      //             });
+                  Swal.fire({
+                  position: 'center',
+                  icon: 'success',
+                  title: 'Record has successfully Deleted',
+                  showConfirmButton: true,
+                  timer: 2500
+                  });
 
-      //             $('.drivers_datatable').DataTable().ajax.reload();
+                  $('.vehicle_datatable').DataTable().ajax.reload();
 
-      //           },
-      //           error: function(response){
-      //             console.log(response);
-      //           }
-      //         });
+                },
+                error: function(response){
+                  console.log(response);
+                }
+              });
 
-      //       }
-      //     });
+            }
+          });
      
-      // });
+      });
 
       // DELETE
 

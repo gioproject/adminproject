@@ -62,9 +62,9 @@
                       <input type="text" name="vehicle_category" value="{{ old('vehicle_category')}}" class="vehicle_category form-control"> 
                     </div>
 
-                    <div class="form-group mb-3">
+                    <div class="form-group mb-3" >
                       <label for="">Vehicle Picture: </label>
-                      <input type="file" name="photo" class="photo form-control"> 
+                      <input type="file" name="photo" class="photo form-control" style="width: 500px"> 
                     </div>
 
                       <div class="ml-4">
@@ -78,8 +78,6 @@
 
 
 @section('scripts');
-
-
 
 
     
